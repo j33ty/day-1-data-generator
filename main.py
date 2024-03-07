@@ -1,5 +1,4 @@
 import os
-import json
 import argparse
 from elasticsearch.elasticsearch import ElasticsearchSink
 
@@ -15,16 +14,11 @@ def main():
     args = parser.parse_args()
     run(args)
 
-def save_to_json(data, filename):
-    with open(filename, 'w') as file:
-        json.dump(data, file, indent=4)
-
 def run(args):
     if args.sink == 'elasticsearch':
         sink = ElasticsearchSink()
-        data = sink.generate(args.records)
-        file_path = os.path.join(generated_file_location, sink.sink_name() + '.json')
-        save_to_json(data, file_path)
+        file_path = os.path.join(generated_file_location, sink.sink_name() + '.ndjson')
+        sink.write(file_path, args.records)
     else:
         print(f"Unsupported sink type: {args.sink}")
         return
